@@ -6,6 +6,11 @@ from flask_cors import CORS
 import google.generativeai as genai
 from dotenv import load_dotenv
 import time
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 load_dotenv()
 
@@ -13,17 +18,41 @@ app = Flask(__name__)
 app.secret_key = os.getenv('FLASK_SECRET_KEY', 'your-secret-key')
 CORS(app)
 
-# Configure Gemini
-genai.configure(api_key=os.getenv('GEMINI_API_KEY'))
+# Configure Gemini with better error handling
+try:
+    api_key = os.getenv('GEMINI_API_KEY')
+    if not api_key:
+        logger.error("GEMINI_API_KEY environment variable is not set!")
+        raise ValueError("GEMINI_API_KEY is required")
+    
+    genai.configure(api_key=api_key)
+    logger.info("Gemini AI configured successfully")
+except Exception as e:
+    logger.error(f"Failed to configure Gemini AI: {e}")
+    raise
 
 # Store chat sessions (in production, use a database)
 chat_sessions = {}
 
+@app.route('/health')
+def health_check():
+    """Health check endpoint for Railway"""
+    return jsonify({
+        'status': 'healthy',
+        'timestamp': time.time(),
+        'gemini_configured': bool(os.getenv('GEMINI_API_KEY'))
+    })
+
 @app.route('/')
 def index():
-    if 'session_id' not in session:
-        session['session_id'] = str(uuid.uuid4())
-    return render_template('index.html')
+    try:
+        if 'session_id' not in session:
+            session['session_id'] = str(uuid.uuid4())
+        logger.info(f"Serving index page for session: {session.get('session_id')}")
+        return render_template('index.html')
+    except Exception as e:
+        logger.error(f"Error serving index page: {e}")
+        return jsonify({'error': 'Internal server error'}), 500
 
 @app.route('/api/chat', methods=['POST'])
 def chat():
@@ -116,6 +145,15 @@ def export_chat():
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    debug_mode = os.environ.get('FLASK_ENV') == 'development'
-    app.run(debug=debug_mode, host='0.0.0.0', port=port)
+    try:
+        port = int(os.environ.get('PORT', 5000))
+        debug_mode = os.environ.get('FLASK_ENV') == 'development'
+        
+        logger.info(f"Starting Flask app on port {port}")
+        logger.info(f"Debug mode: {debug_mode}")
+        logger.info(f"Gemini API key configured: {bool(os.getenv('GEMINI_API_KEY'))}")
+        
+        app.run(debug=debug_mode, host='0.0.0.0', port=port)
+    except Exception as e:
+        logger.error(f"Failed to start Flask app: {e}")
+        raise
