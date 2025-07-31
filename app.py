@@ -22,17 +22,24 @@ CORS(app)
 try:
     api_key = os.getenv('GEMINI_API_KEY')
     if not api_key:
-        logger.error("GEMINI_API_KEY environment variable is not set!")
-        raise ValueError("GEMINI_API_KEY is required")
-    
-    genai.configure(api_key=api_key)
-    logger.info("Gemini AI configured successfully")
+        logger.warning("GEMINI_API_KEY environment variable is not set! App will start but AI features won't work.")
+        # Don't raise an error, let the app start
+        genai_configured = False
+    else:
+        genai.configure(api_key=api_key)
+        logger.info("Gemini AI configured successfully")
+        genai_configured = True
 except Exception as e:
     logger.error(f"Failed to configure Gemini AI: {e}")
-    raise
+    genai_configured = False
 
 # Store chat sessions (in production, use a database)
 chat_sessions = {}
+
+@app.route('/test')
+def test():
+    """Simple test endpoint"""
+    return "Hello from AI Chatbot! The app is running correctly."
 
 @app.route('/health')
 def health_check():
@@ -40,7 +47,9 @@ def health_check():
     return jsonify({
         'status': 'healthy',
         'timestamp': time.time(),
-        'gemini_configured': bool(os.getenv('GEMINI_API_KEY'))
+        'gemini_configured': genai_configured,
+        'port': os.environ.get('PORT', 'not set'),
+        'environment': os.environ.get('FLASK_ENV', 'not set')
     })
 
 @app.route('/')
@@ -57,6 +66,9 @@ def index():
 @app.route('/api/chat', methods=['POST'])
 def chat():
     try:
+        if not genai_configured:
+            return jsonify({'error': 'AI service not configured. Please check environment variables.'}), 503
+            
         data = request.get_json()
         message = data.get('message', '').strip()
         session_id = session.get('session_id')
