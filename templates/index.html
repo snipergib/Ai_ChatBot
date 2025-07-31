@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chatbot - Gemini Powered</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container" id="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1 class="app-title">
+                    <i class="fas fa-robot"></i>
+                    AI Assistant
+                </h1>
+                <div class="header-controls">
+                    <button class="btn-icon theme-toggle" id="theme-toggle" title="Toggle Theme">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                    <button class="btn-icon export-btn" id="export-btn" title="Export Chat">
+                        <i class="fas fa-download"></i>
+                    </button>
+                    <button class="btn-icon clear-btn" id="clear-btn" title="Clear Chat">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                    <button class="btn-icon menu-btn" id="menu-btn" title="Menu">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- 3D Background -->
+        <div class="spline-container">
+            <iframe src="https://my.spline.design/untitled-7d51e3ab8ee8c5e6bd72d1e6d75d3b5d/" 
+                    frameborder="0" width="100%" height="100%"></iframe>
+        </div>
+
+        <!-- Chat Container -->
+        <main class="chat-container">
+            <div class="welcome-message" id="welcome-message">
+                <div class="welcome-content">
+                    <i class="fas fa-comments welcome-icon"></i>
+                    <h2>Welcome to AI Assistant</h2>
+                    <p>Start a conversation with our AI-powered chatbot. Ask questions, get help, or just chat!</p>
+                </div>
+            </div>
+            
+            <div class="messages-container" id="messages-container">
+                <!-- Messages will be dynamically inserted here -->
+            </div>
+            
+            <!-- Typing Indicator -->
+            <div class="typing-indicator" id="typing-indicator" style="display: none;">
+                <div class="message ai-message">
+                    <div class="avatar ai-avatar">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="message-content">
+                        <div class="typing-dots">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Input Area -->
+        <div class="input-container">
+            <form class="input-form" id="chat-form">
+                <div class="input-wrapper">
+                    <textarea 
+                        id="message-input" 
+                        placeholder="Ask me anything... I'm here to help!" 
+                        rows="1"
+                        maxlength="2000"></textarea>
+                    <button type="submit" class="send-btn" id="send-btn">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+                <div class="input-footer">
+                    <div class="input-hints">
+                        <span>Press Enter to send</span>
+                        <span>•</span>
+                        <span>Shift + Enter for new line</span>
+                    </div>
+                    <span class="char-counter" id="char-counter">0/2000</span>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Dropdown Menu -->
+    <div class="dropdown-menu" id="dropdown-menu">
+        <div class="dropdown-item" id="settings-btn">
+            <i class="fas fa-cog"></i>
+            <span>Settings</span>
+        </div>
+        <div class="dropdown-item" id="about-btn">
+            <i class="fas fa-info-circle"></i>
+            <span>About</span>
+        </div>
+        <div class="dropdown-item" id="keyboard-shortcuts-btn">
+            <i class="fas fa-keyboard"></i>
+            <span>Keyboard Shortcuts</span>
+        </div>
+        <div class="dropdown-divider"></div>
+        <div class="dropdown-item" id="feedback-btn">
+            <i class="fas fa-comment"></i>
+            <span>Send Feedback</span>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal-overlay" id="settings-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-cog"></i> Settings</h2>
+                <button class="modal-close" id="settings-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="settings-section">
+                    <h3>Appearance</h3>
+                    <div class="setting-item">
+                        <label>Theme</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="theme" value="auto" id="theme-auto" checked>
+                                <span>Auto</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="theme" value="light" id="theme-light">
+                                <span>Light</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="theme" value="dark" id="theme-dark">
+                                <span>Dark</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="setting-item">
+                        <label for="font-size">Font Size</label>
+                        <input type="range" id="font-size" min="12" max="20" value="14" class="setting-slider">
+                        <span class="slider-value">14px</span>
+                    </div>
+                </div>
+                
+                <div class="settings-section">
+                    <h3>Chat Behavior</h3>
+                    <div class="setting-item">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="send-on-enter" checked>
+                            <span>Send on Enter (Shift+Enter for new line)</span>
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="auto-scroll" checked>
+                            <span>Auto-scroll to bottom</span>
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="message-timestamps">
+                            <span>Show message timestamps</span>
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="sound-effects">
+                            <span>Enable notification sounds</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="settings-section">
+                    <h3>Advanced</h3>
+                    <div class="setting-item">
+                        <label for="animation-speed">Animation Speed</label>
+                        <select id="animation-speed" class="setting-select">
+                            <option value="slow">Slow</option>
+                            <option value="normal" selected>Normal</option>
+                            <option value="fast">Fast</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="reset-settings">Reset to Default</button>
+                <button class="btn-primary" id="save-settings">Save Settings</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- About Modal -->
+    <div class="modal-overlay" id="about-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-info-circle"></i> About AI Assistant</h2>
+                <button class="modal-close" id="about-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="about-content">
+                    <div class="about-logo">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <h3>AI Assistant v1.0</h3>
+                    <p>Powered by Google Gemini AI</p>
+                    <div class="about-features">
+                        <h4>Features:</h4>
+                        <ul>
+                            <li>Real-time streaming responses</li>
+                            <li>Code syntax highlighting</li>
+                            <li>Copy and regenerate functionality</li>
+                            <li>Dark/Light theme support</li>
+                            <li>Mobile-responsive design</li>
+                        </ul>
+                    </div>
+                    <div class="about-info">
+                        <p><strong>Built with:</strong> Flask, JavaScript, GSAP, Font Awesome</p>
+                        <p><strong>AI Model:</strong> Gemini 1.5 Flash</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Keyboard Shortcuts Modal -->
+    <div class="modal-overlay" id="shortcuts-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-keyboard"></i> Keyboard Shortcuts</h2>
+                <button class="modal-close" id="shortcuts-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="shortcuts-grid">
+                    <div class="shortcut-item">
+                        <kbd>Enter</kbd>
+                        <span>Send message</span>
+                    </div>
+                    <div class="shortcut-item">
+                        <kbd>Shift</kbd> + <kbd>Enter</kbd>
+                        <span>New line</span>
+                    </div>
+                    <div class="shortcut-item">
+                        <kbd>Ctrl</kbd> + <kbd>K</kbd>
+                        <span>Clear chat</span>
+                    </div>
+                    <div class="shortcut-item">
+                        <kbd>Ctrl</kbd> + <kbd>D</kbd>
+                        <span>Toggle theme</span>
+                    </div>
+                    <div class="shortcut-item">
+                        <kbd>Ctrl</kbd> + <kbd>S</kbd>
+                        <span>Export chat</span>
+                    </div>
+                    <div class="shortcut-item">
+                        <kbd>Esc</kbd>
+                        <span>Close modal</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loading-screen" style="display: none;">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <h3>Initializing AI Assistant...</h3>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
+    <!-- Immediate loading screen fix -->
+    <script>
+        console.log('Immediate loading screen fix executing...');
+        
+        // Force hide loading screen after a short delay
+        setTimeout(() => {
+            const loadingScreen = document.getElementById('loading-screen');
+            if (loadingScreen) {
+                console.log('Force hiding loading screen');
+                loadingScreen.style.display = 'none';
+                loadingScreen.style.opacity = '0';
+            }
+            
+            // Show main app container
+            const appContainer = document.getElementById('app-container');
+            if (appContainer) {
+                appContainer.style.opacity = '1';
+                console.log('App container made visible');
+            }
+        }, 1000);
+        
+        // Also try to hide it immediately when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM loaded - hiding loading screen immediately');
+            const loadingScreen = document.getElementById('loading-screen');
+            if (loadingScreen) {
+                loadingScreen.style.display = 'none';
+            }
+        });
+    </script>
+    
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
