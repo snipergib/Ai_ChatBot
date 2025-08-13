@@ -21,14 +21,10 @@ A modern, responsive AI chatbot application powered by Google's Gemini AI model.
 - **Markdown support** with syntax highlighting
 - **Code block rendering** with copy functionality
 - **Regenerate responses** feature
-- **Chat history management**
 
 ### 🛠 **Advanced Features**
-- **Three-dot menu** with comprehensive options
-- **Settings modal** with persistent preferences
 - **Keyboard shortcuts** for power users
 - **Copy & paste functionality** for messages and code
-- **Export chat history** as text files
 - **Auto-scroll and timestamps** options
 
 ### ⌨️ **Keyboard Shortcuts**
