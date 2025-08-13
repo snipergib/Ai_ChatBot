@@ -1,6 +1,6 @@
 # AI Chatbot - Gemini Powered
 
-A modern, responsive AI chatbot application powered by Google's Gemini AI model. Features a sleek ChatGPT-style interface with advanced functionality and customization options.
+A modern, responsive AI chatbot application powered by Google's Gemini AI model. Features a sleek interface with advanced functionality and customization options.
 
 ![AI Chatbot](https://img.shields.io/badge/AI-Gemini%20Powered-blue)
 ![Python](https://img.shields.io/badge/Python-3.9+-green)
@@ -10,7 +10,7 @@ A modern, responsive AI chatbot application powered by Google's Gemini AI model.
 ## ✨ Features
 
 ### 🎨 **Modern UI/UX**
-- **ChatGPT-style interface** with glass-morphism design
+- **Sleek-style interface** with glass-morphism design
 - **Dark/Light/Auto themes** with smooth transitions
 - **Responsive design** that works on all devices
 - **3D animated background** using Spline
@@ -181,7 +181,3 @@ If you encounter any issues or have questions:
 1. Check the [Issues](../../issues) page
 2. Create a new issue with detailed information
 3. Include your browser and Python version
-
----
-
-**Made with ❤️ and AI**
